@@ -13,9 +13,11 @@
 <body>
   <div id="app">
     <table>
-    <tr>
-      <td> {{date}} </td>
-      <td> {{message}} </td>
+    <tr is="portfolio-element"
+      v-for="stock in stocks"
+      v-bind:key="stock.id"
+      v-bind:stock="stock"
+      v-on:sell-stock="sell_stock(stock)">
     </tr>
     </table>
   </div>
