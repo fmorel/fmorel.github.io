@@ -8,11 +8,34 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <!-- Alphavantage -->
   <script src="https://cdn.jsdelivr.net/npm/alphavantage/dist/bundle.js"></script>
+  <!-- Pure CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css">
+  <style>
+      .content {
+        margin: auto;
+        width: 50%;
+        padding: 20px;
+        float: none;
+      }
+      .content table {
+        margin: auto;
+      }
+  </style>
   <title>My first Vue app</title>
 </head>
+
 <body>
+  <div class="content">
   <div id="app">
-    <table>
+    <table class="pure-table pure-table-striped">
+    <thead>
+    <tr>
+        <th>Symbol</th>
+        <th>Buying price</th>
+        <th>Current price</th>
+        <th>Action</th>
+    </tr>
+    </thead>
     <tr is="portfolio-element"
       v-for="stock in stocks"
       v-bind:key="stock.id"
@@ -20,6 +43,7 @@
       v-on:sell-stock="sell_stock(stock)">
     </tr>
     </table>
+  </div>
   </div>
   <script defer src="src/main.js"></script>
 </body>
