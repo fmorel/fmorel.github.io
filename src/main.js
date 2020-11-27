@@ -27,20 +27,22 @@ var alpha_wrapper = {
     }
 };
 
-var alpha_wrapper2 = {
-    handle: undefined,
-    options: {
+function AlphaWrapper2() {
+    this.options = {
         interval: 'daily',
         amount: '1'
-    },
-    fetch_price : function(stock) {
+    };
+    this.handle = new Stocks('L7B1PRR8D9I68OSZ');
+    this.fetch_price = function (stock) {
         this.options.symbol = stock.symbol;
         this.handle.timeSeries(this.options).then(
             (result) => {
                 stock.price = result[0].high;
             });
-    }
-};          
+    };
+};
+
+var alpha_wrapper2 = new AlphaWrapper2();
 
 var app = new Vue({
     el: '#app',
@@ -62,7 +64,6 @@ var app = new Vue({
         ],
     },
     mounted: function () {
-        alpha_wrapper2.handle = new Stocks('L7B1PRR8D9I68OSZ'); 
         for (let stock of this.stocks) {
             alpha_wrapper2.fetch_price(stock);
         }
