@@ -164,19 +164,23 @@ Stocks.prototype = {
       this._throw(0, 'error');
     }
 
-    tthis = this
+    tthis = this;
 
     return new Promise((resolve, reject) => {
       var url = this._createUrl(params);
 
-      fetch(url).then(function (response) {
+      fetch(url)
+      .then(function (response) {
         return response.json();
-      }).then(function (data) {
+      })
+      .then(function (data) {
         if (typeof data['Error Message'] !== 'undefined') {
-          tthis._throw(9, 'error');
+            reject(tthis.MESSAGES[9]);
+        } else if (typeof data['Note'] !== 'undefined') {
+            reject(tthis.MESSAGES[9]);
+        } else {
+            resolve(data);
         }
-
-        resolve(data);
       });
     });
   },

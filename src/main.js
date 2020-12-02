@@ -1,31 +1,32 @@
+Vue.config.productionTip = false;
 
 Vue.component('portfolio-element', {
     props: {
         stock: Object
     },
+    computed: {
+        get_price_style: function() {
+            ret = {};
+            if (this.stock.error) {
+                ret.backgroundColor = "black";
+                ret.color = "red";
+            } else if (this.stock.price > this.stock.buying_price) {
+                ret.color = "green";
+            } else {
+                ret.color = "red";
+            }
+            return ret;
+        }
+    },      
     template: `
         <tr>
         <td> {{stock.symbol}} </td>
         <td> {{stock.buying_price}} </td>
-        <td style="color:green"> {{stock.price}} </td>
+        <td v-bind:style="get_price_style"> {{stock.price}} </td>
         <td> <button v-on:click="$emit('sell-stock')"> Sell </button> </td>
         </tr>
     `
 });
-
-
-var alpha_wrapper = {
-    alpha : alphavantage({ key: 'L7B1PRR8D9I68OSZ' }),
-
-    fetch_price : function (stock) {
-        this.alpha.data.daily(stock.symbol).then((data) => {
-            const daily = data["Time Series (Daily)"];
-            const date = Object.keys(daily)[0];
-            const firstDay = daily[date];
-            stock.price = firstDay["1. open"];
-        });
-    }
-};
 
 function AlphaWrapper2() {
     this.options = {
@@ -35,10 +36,16 @@ function AlphaWrapper2() {
     this.handle = new Stocks('L7B1PRR8D9I68OSZ');
     this.fetch_price = function (stock) {
         this.options.symbol = stock.symbol;
-        this.handle.timeSeries(this.options).then(
-            (result) => {
-                stock.price = result[0].high;
-            });
+        this.handle.timeSeries(this.options)
+            .then(
+                (result) => {
+                    stock.price = result[0].high;
+                })
+            .catch(
+                (error) => {
+                    stock.error = true;
+                    stock.price = 'N/A';
+                });
     };
 };
 
@@ -47,7 +54,10 @@ var alpha_wrapper2 = new AlphaWrapper2();
 var app = new Vue({
     el: '#app',
     data: {
-        message: "waiting ...",
+        addsymbol: "",
+        addamount: 1,
+        addprice: 0,
+        currentId: 2,
         stocks: [
           {
             id: 0,
@@ -64,6 +74,7 @@ var app = new Vue({
         ],
     },
     mounted: function () {
+        console.log('Coucou');
         for (let stock of this.stocks) {
             alpha_wrapper2.fetch_price(stock);
         }
@@ -71,6 +82,19 @@ var app = new Vue({
     methods: {
         sell_stock : function (stock) {
             alert("Stock " + stock.symbol + " sold !");
+        },
+        add_stock : function() {
+            stock = 
+              {
+                id: this.currentId,
+                symbol: this.addsymbol, 
+                buying_price: this.addprice,
+                price: '...'
+              };
+            alpha_wrapper2.fetch_price(stock);
+            this.stocks.push(stock);
+            this.currentId++;
+            alert("Stock "+ this.addsymbol + " added");
         }
     }
 });

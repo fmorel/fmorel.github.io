@@ -19,7 +19,7 @@
       }
       .content table {
         margin: auto;
-        width: 50%;
+        width: 100%;
       }
       th {
         text-align: center;
@@ -46,6 +46,20 @@
   </div>
   <br>
   <div id="app">
+    <form class="pure-form">
+        <fieldset>
+        <legend>Add new stock</legend>
+        <label for="symbol"> Symbol :</label>
+        <input id="symbol" v-model="addsymbol">
+        <label for="amount"> Amount :</label>
+        <input id="amount" v-model="addamount">
+        </fieldset>
+        <fieldset>
+        <label for="price"> Buying price :</label>
+        <input id="price" v-model="addprice">
+        <button type="button" class="pure-button pure-button-primary" v-on:click="add_stock">Add</button>
+        </fieldset>
+    </form>
     <table class="pure-table pure-table-striped">
     <thead >
     <tr>
