@@ -175,9 +175,13 @@ Stocks.prototype = {
       })
       .then(function (data) {
         if (typeof data['Error Message'] !== 'undefined') {
-            reject(tthis.MESSAGES[9]);
+            reject({
+                error:true, 
+                message: data['Error Message']});
         } else if (typeof data['Note'] !== 'undefined') {
-            reject(tthis.MESSAGES[9]);
+            reject({
+                timeout: true,
+                message: data['Note']});
         } else {
             resolve(data);
         }

@@ -16,14 +16,20 @@ Vue.component('portfolio-element', {
                 ret.color = "red";
             }
             return ret;
+        },
+        get_price: function() {
+            price = (this.stock.price - this.stock.buying_price) * this.stock.amount;
+            return price.toFixed(2);
         }
     },      
     template: `
         <tr>
         <td> {{stock.symbol}} </td>
         <td> {{stock.buying_price}} </td>
+        <td> {{stock.amount}} </td>
         <td v-bind:style="get_price_style"> {{stock.price}} </td>
-        <td> <button v-on:click="$emit('sell-stock')"> Sell </button> </td>
+        <td v-bind:style="get_price_style"> {{get_price}} </td>
+        <td class="centered"> <button v-on:click="$emit('sell-stock')"> Sell </button> </td>
         </tr>
     `
 });
@@ -44,7 +50,10 @@ function AlphaWrapper2() {
             .catch(
                 (error) => {
                     stock.error = true;
-                    stock.price = 'N/A';
+                    if (error.timeout)
+                        stock.price = '...';
+                    else if (error.error)
+                        stock.price = 'Symbol unknown';
                 });
     };
 };
@@ -63,13 +72,15 @@ var app = new Vue({
             id: 0,
             symbol: 'SQNS',
             buying_price: 2.00,
-            price: '...'
+            price: '...',
+            amount: 10
           },
           {
             id: 1,
             symbol: 'IBM',
             buying_price: 80.0,
-            price: '...'
+            price: '...',
+            amount: 5,
           }
         ],
     },
@@ -89,6 +100,7 @@ var app = new Vue({
                 id: this.currentId,
                 symbol: this.addsymbol, 
                 buying_price: this.addprice,
+                amount: this.addamount,
                 price: '...'
               };
             alpha_wrapper2.fetch_price(stock);
