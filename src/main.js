@@ -1,4 +1,5 @@
 Vue.config.productionTip = false;
+const price_wait = '...';
 
 Vue.component('portfolio-element', {
     props: {
@@ -7,17 +8,24 @@ Vue.component('portfolio-element', {
     computed: {
         get_price_style: function() {
             ret = {};
-            if (this.stock.error) {
-                ret.backgroundColor = "black";
-                ret.color = "red";
+            if (this.stock.price === price_wait) {
+                ret.color = 'blue';
+            } else if (this.stock.error) {
+                ret.backgroundColor = 'black';
+                ret.color = 'red';
             } else if (this.stock.price > this.stock.buying_price) {
-                ret.color = "green";
+                ret.color = 'green';
             } else {
                 ret.color = "red";
             }
             return ret;
         },
         get_price: function() {
+            if (this.stock.price === price_wait) {
+                return price_wait;
+            } else if (this.stock.error) {
+                return 'N/A';
+            }
             price = (this.stock.price - this.stock.buying_price) * this.stock.amount;
             return price.toFixed(2);
         }
@@ -41,6 +49,7 @@ function AlphaWrapper2() {
     };
     this.handle = new Stocks('L7B1PRR8D9I68OSZ');
     this.fetch_price = function (stock) {
+        tthis = this;
         this.options.symbol = stock.symbol;
         this.handle.timeSeries(this.options)
             .then(
@@ -49,50 +58,47 @@ function AlphaWrapper2() {
                 })
             .catch(
                 (error) => {
-                    stock.error = true;
-                    if (error.timeout)
-                        stock.price = '...';
-                    else if (error.error)
+                    if (error.timeout) {
+                        stock.price = price_wait;
+                        setTimeout(function() {g_fetch_price(stock);}, 30000);
+                    } else if (error.error) {
                         stock.price = 'Symbol unknown';
+                    }
                 });
     };
 };
 
 var alpha_wrapper2 = new AlphaWrapper2();
 
+function g_fetch_price(stock)
+{
+    alpha_wrapper2.fetch_price(stock);
+}
+
 var app = new Vue({
     el: '#app',
     data: {
         addsymbol: "",
         addamount: 1,
-        addprice: 0,
-        currentId: 2,
-        stocks: [
-          {
-            id: 0,
-            symbol: 'SQNS',
-            buying_price: 2.00,
-            price: '...',
-            amount: 10
-          },
-          {
-            id: 1,
-            symbol: 'IBM',
-            buying_price: 80.0,
-            price: '...',
-            amount: 5,
-          }
-        ],
+        addprice: 10,
+        currentId: 0,
+        stocks: [],
+        cash: 0,
     },
     mounted: function () {
         console.log('Coucou');
+        my_object = localStorage.getItem("stocks");
+        if (my_object !== null)
+            this.stocks = JSON.parse(my_object);
+        this.currentId = localStorage.getItem("currentId");
         for (let stock of this.stocks) {
-            alpha_wrapper2.fetch_price(stock);
+            g_fetch_price(stock);
         }
     },
     methods: {
         sell_stock : function (stock) {
-            alert("Stock " + stock.symbol + " sold !");
+            this.stocks.splice(this.stocks.indexOf(stock), 1);
+            localStorage.setItem("stocks", JSON.stringify(this.stocks));
         },
         add_stock : function() {
             stock = 
@@ -101,12 +107,13 @@ var app = new Vue({
                 symbol: this.addsymbol, 
                 buying_price: this.addprice,
                 amount: this.addamount,
-                price: '...'
+                price: price_wait
               };
-            alpha_wrapper2.fetch_price(stock);
+            g_fetch_price(stock);
             this.stocks.push(stock);
             this.currentId++;
-            alert("Stock "+ this.addsymbol + " added");
+            localStorage.setItem("stocks", JSON.stringify(this.stocks));
+            localStorage.setItem("currentId", this.currentId);
         }
     }
 });
