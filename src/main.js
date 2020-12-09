@@ -26,8 +26,16 @@ Vue.component('portfolio-element', {
             } else if (this.stock.error) {
                 return 'N/A';
             }
-            price = (this.stock.price - this.stock.buying_price) * this.stock.amount;
-            return price.toFixed(2);
+            return this.stock.sold_price().toFixed(2);
+        },
+        get_percent: function() {
+             if (this.stock.price === price_wait) {
+                return price_wait;
+            } else if (this.stock.error) {
+                return 'N/A';
+            }
+            let p = 100 * (this.stock.price - this.stock.buying_price)/this.stock.buying_price;
+            return p.toFixed(2);
         }
     },      
     template: `
@@ -35,7 +43,7 @@ Vue.component('portfolio-element', {
         <td> {{stock.symbol}} </td>
         <td> {{stock.buying_price}} </td>
         <td> {{stock.amount}} </td>
-        <td v-bind:style="get_price_style"> {{stock.price}} </td>
+        <td v-bind:style="get_price_style"> {{stock.price}} ({{get_percent}}%) </td>
         <td v-bind:style="get_price_style"> {{get_price}} </td>
         <td class="centered"> <button v-on:click="$emit('sell-stock')"> Sell </button> </td>
         </tr>
@@ -62,6 +70,7 @@ function AlphaWrapper2() {
                         stock.price = price_wait;
                         setTimeout(function() {g_fetch_price(stock);}, 30000);
                     } else if (error.error) {
+                        stock.error = true;
                         stock.price = 'Symbol unknown';
                     }
                 });
@@ -75,6 +84,22 @@ function g_fetch_price(stock)
     alpha_wrapper2.fetch_price(stock);
 }
 
+function Stock(id, symbol, buying_price, amount) {
+    this.id = id;
+    this.symbol = symbol;
+    this.buying_price = buying_price;
+    this.amount = amount;
+    this.price = price_wait;
+    this.error = false;
+}
+
+Stock.prototype.sold_price = function()
+{
+    if (this.error || this.price === price_wait)
+        return 0;
+    return (this.price - this.buying_price) * this.amount;
+}
+
 var app = new Vue({
     el: '#app',
     data: {
@@ -86,32 +111,43 @@ var app = new Vue({
         cash: 0,
     },
     mounted: function () {
-        console.log('Coucou');
         my_object = localStorage.getItem("stocks");
         if (my_object !== null)
-            this.stocks = JSON.parse(my_object);
+            this.stocks = JSON.parse(my_object).map(x => Object.setPrototypeOf(x, Stock.prototype));
         this.currentId = localStorage.getItem("currentId");
         for (let stock of this.stocks) {
             g_fetch_price(stock);
         }
     },
+    computed : {
+        potential_gains: function() {
+            let sum = 0;
+            for (let stock of this.stocks) {
+                sum += stock.sold_price();
+            }
+            return sum.toFixed(2);
+        }
+    },
     methods: {
         sell_stock : function (stock) {
             this.stocks.splice(this.stocks.indexOf(stock), 1);
+            cash += stock.sold_price();
             localStorage.setItem("stocks", JSON.stringify(this.stocks));
         },
         add_stock : function() {
-            stock = 
-              {
-                id: this.currentId,
-                symbol: this.addsymbol, 
-                buying_price: this.addprice,
-                amount: this.addamount,
-                price: price_wait
-              };
+            stock = new Stock(this.currentId,
+                              this.addsymbol, 
+                              this.addprice,
+                              this.addamount);
             g_fetch_price(stock);
             this.stocks.push(stock);
             this.currentId++;
+            localStorage.setItem("stocks", JSON.stringify(this.stocks));
+            localStorage.setItem("currentId", this.currentId);
+        },
+        clear_all: function() {
+            this.stocks =  [];
+            this.currentId = 0;
             localStorage.setItem("stocks", JSON.stringify(this.stocks));
             localStorage.setItem("currentId", this.currentId);
         }

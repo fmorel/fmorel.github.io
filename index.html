@@ -32,8 +32,11 @@
         align-items: center;
         margin: auto;
       }
-      #centered {
+      .centered {
         text-align: center;
+      }
+      .padded {
+        padding: 2em
       }
   </style>
   <title>Portfolio</title>
@@ -41,44 +44,68 @@
 
 <body>
   <div class="content">
-  <div class="splash">
-    <h1> My portfolio </h1>
-  </div>
-  <br>
-  <div id="app">
-    <form class="pure-form">
-        <fieldset>
-        <legend>Add new stock</legend>
-        <label for="symbol"> Symbol :</label>
-        <input id="symbol" v-model="addsymbol">
-        <label for="amount"> Amount :</label>
-        <input id="amount" v-model="addamount">
-        </fieldset>
-        <fieldset>
-        <label for="price"> Buying price :</label>
-        <input id="price" v-model="addprice">
-        <button type="button" class="pure-button pure-button-primary" v-on:click="add_stock">Add</button>
-        </fieldset>
-    </form>
-    <table class="pure-table pure-table-striped">
-    <thead >
-    <tr>
-        <th>Symbol</th>
-        <th>Buying price</th>
-        <th>Amount</th>
-        <th>Current price</th>
-        <th>Benefit</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tr is="portfolio-element"
-      v-for="stock in stocks"
-      v-bind:key="stock.id"
-      v-bind:stock="stock"
-      v-on:sell-stock="sell_stock(stock)">
-    </tr>
-    </table>
-  </div>
+    <div class="splash">
+      <h1> My portfolio </h1>
+    </div>
+    <br>
+    <div id="app">
+      <div class="pure-g">
+        <div class="pure-u-2-3">
+        <div class="padded">
+          <form class="pure-form pure-form-aligned">
+            <fieldset>
+            <legend>Add new stock</legend>
+            <div class="pure-control-group">
+              <label for="symbol"> Symbol :</label>
+              <input id="symbol" v-model="addsymbol">
+            </div>
+            <div class="pure-control-group">
+              <label for="amount"> Amount :</label>
+              <input id="amount" v-model="addamount">
+            </div>
+            <div class="pure-control-group">
+              <label for="price"> Buying price :</label>
+              <input id="price" v-model="addprice">
+            </div>
+            <div class="pure-controls">
+              <button type="button" class="pure-button pure-button-primary" v-on:click="add_stock">Add</button>
+            </div>
+            </fieldset>
+          </form>
+        </div>
+        </div>
+        <div class="pure-u-1-3">
+        <div class="padded centered">
+          <br>
+          <b>Cash balance : {{cash}}</b>
+          <br><br>
+          <b>Potential gains: {{potential_gains}}</b>
+          <br><br>
+          <button type="button" class="pure-button" v-on:click="clear_all">Clear all</button>
+        </div>
+        </div>
+      </div>
+      <div>
+        <table class="pure-table pure-table-striped">
+        <thead >
+        <tr>
+            <th>Symbol</th>
+            <th>Buying price</th>
+            <th>Amount</th>
+            <th>Current price</th>
+            <th>Benefit</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tr is="portfolio-element"
+          v-for="stock in stocks"
+          v-bind:key="stock.id"
+          v-bind:stock="stock"
+          v-on:sell-stock="sell_stock(stock)">
+        </tr>
+        </table>
+      </div>
+    </div>
   </div>
   <script defer src="ext/stocks.js"></script>
   <script defer src="src/main.js"></script>
