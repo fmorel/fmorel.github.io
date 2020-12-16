@@ -13,7 +13,7 @@
   <style>
       .content {
         margin: auto;
-        width: 50%;
+        max-width: 768px;
         padding: 2em;
         float: none;
       }
@@ -36,7 +36,11 @@
         text-align: center;
       }
       .padded {
-        padding: 2em
+        padding: 10px
+      }
+      .button-danger {
+        color: white;
+        background: rgb(202, 60, 60);
       }
   </style>
   <title>Portfolio</title>
@@ -75,13 +79,28 @@
         </div>
         </div>
         <div class="pure-u-1-3">
-        <div class="padded centered">
-          <br>
-          <b>Cash balance : {{cash}}</b>
-          <br><br>
-          <b>Potential gains: {{potential_gains}}</b>
-          <br><br>
-          <button type="button" class="pure-button" v-on:click="clear_all">Clear all</button>
+        <div class="padded">
+          <form class="pure-form pure-form-aligned">
+          <legend>Summary</legend>
+            <fieldset>
+            <div class="pure-control-group">
+              <label for="cash">Cash :</label>
+              <input id="cash" v-model="cash" readonly="">
+            </div>
+            <div class="pure-control-group">
+              <label for="gains"> Gains</label>
+              <input id="gains" v-model="potential_gains" readonly="">
+            </div>
+            </fieldset>
+            <fieldset>
+              <textarea class="pure-input">{{storage_string}}</textarea>
+            </fieldset>
+            <fieldset>
+              <button type="button" class ="pure-button" v-on:click="import_storage">Import</button>
+              <button type="button" class ="pure-button" v-on:click="export_storage">Export</button>
+            </fieldset>
+            <button type="button" class="pure-button button-danger" v-on:click="clear_all">Clear all</button>
+          </form>
         </div>
         </div>
       </div>

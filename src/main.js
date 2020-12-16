@@ -45,7 +45,7 @@ Vue.component('portfolio-element', {
         <td> {{stock.amount}} </td>
         <td v-bind:style="get_price_style"> {{stock.price}} ({{get_percent}}%) </td>
         <td v-bind:style="get_price_style"> {{get_price}} </td>
-        <td class="centered"> <button v-on:click="$emit('sell-stock')"> Sell </button> </td>
+        <td class="centered"> <button class="pure-button" v-on:click="$emit('sell-stock')"> Sell </button> </td>
         </tr>
     `
 });
@@ -109,22 +109,28 @@ var app = new Vue({
         currentId: 0,
         stocks: [],
         cash: 0,
+        storage_string: "",
     },
     mounted: function () {
         my_object = localStorage.getItem("stocks");
         if (my_object !== null)
             this.stocks = JSON.parse(my_object).map(x => Object.setPrototypeOf(x, Stock.prototype));
-        this.currentId = localStorage.getItem("currentId");
+        this.currentId = this.stocks.reduce(
+                            function(max, s) {
+                                if (s.id > max)
+                                    return s.id;
+                                return max;
+                            }, 0);
         for (let stock of this.stocks) {
             g_fetch_price(stock);
         }
     },
     computed : {
         potential_gains: function() {
-            let sum = 0;
-            for (let stock of this.stocks) {
-                sum += stock.sold_price();
-            }
+            let sum = this.stocks.reduce(
+                        function(sum, s) {
+                            return sum + s.sold_price();
+                        }, 0);
             return sum.toFixed(2);
         }
     },
@@ -132,7 +138,7 @@ var app = new Vue({
         sell_stock : function (stock) {
             this.stocks.splice(this.stocks.indexOf(stock), 1);
             cash += stock.sold_price();
-            localStorage.setItem("stocks", JSON.stringify(this.stocks));
+            this.refresh();
         },
         add_stock : function() {
             stock = new Stock(this.currentId,
@@ -142,14 +148,30 @@ var app = new Vue({
             g_fetch_price(stock);
             this.stocks.push(stock);
             this.currentId++;
-            localStorage.setItem("stocks", JSON.stringify(this.stocks));
-            localStorage.setItem("currentId", this.currentId);
+            this.refresh();
         },
         clear_all: function() {
             this.stocks =  [];
             this.currentId = 0;
+            this.refresh();
+        },
+        refresh: function() {
             localStorage.setItem("stocks", JSON.stringify(this.stocks));
-            localStorage.setItem("currentId", this.currentId);
+        },
+        export_storage: function() {
+            this.storage_string = btoa(localStorage.getItem("stocks"));
+            navigator.clipboard.write(this.storage_string).then(
+                function () {
+                    alert("Storage string copied to clipboard");
+                });
+        },
+        import_storage: function() {
+            /* Only change localstorage and reload the page.
+             * Let the mounted function handle everything */
+            localStorage.setItem("stocks", atob(this.storage_string));
+            location.reload();
+            return false;
         }
+
     }
 });
