@@ -93,7 +93,7 @@
             </div>
             </fieldset>
             <fieldset>
-              <textarea class="pure-input">{{storage_string}}</textarea>
+              <textarea class="pure-input" v-model="storage_string"></textarea>
             </fieldset>
             <fieldset>
               <button type="button" class ="pure-button" v-on:click="import_storage">Import</button>
