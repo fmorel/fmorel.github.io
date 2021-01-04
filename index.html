@@ -21,6 +21,10 @@
         margin: auto;
         width: 100%;
       }
+      .content textarea {
+        width: 100%;
+        max-width: 100%;
+      }
       th {
         text-align: center;
       }
@@ -42,6 +46,12 @@
         color: white;
         background: rgb(202, 60, 60);
       }
+      .section-header {
+        border-bottom-style: solid;
+        border-color: grey;
+        padding: 1em;
+        font-weight: bold;
+      }
   </style>
   <title>Portfolio</title>
 </head>
@@ -53,57 +63,7 @@
     </div>
     <br>
     <div id="app">
-      <div class="pure-g">
-        <div class="pure-u-2-3">
-        <div class="padded">
-          <form class="pure-form pure-form-aligned">
-            <fieldset>
-            <legend>Add new stock</legend>
-            <div class="pure-control-group">
-              <label for="symbol"> Symbol :</label>
-              <input id="symbol" v-model="addsymbol">
-            </div>
-            <div class="pure-control-group">
-              <label for="amount"> Amount :</label>
-              <input id="amount" v-model="addamount">
-            </div>
-            <div class="pure-control-group">
-              <label for="price"> Buying price :</label>
-              <input id="price" v-model="addprice">
-            </div>
-            <div class="pure-controls">
-              <button type="button" class="pure-button pure-button-primary" v-on:click="add_stock">Add</button>
-            </div>
-            </fieldset>
-          </form>
-        </div>
-        </div>
-        <div class="pure-u-1-3">
-        <div class="padded">
-          <form class="pure-form pure-form-aligned">
-          <legend>Summary</legend>
-            <fieldset>
-            <div class="pure-control-group">
-              <label for="cash">Cash :</label>
-              <input id="cash" v-model="cash" readonly="">
-            </div>
-            <div class="pure-control-group">
-              <label for="gains"> Gains</label>
-              <input id="gains" v-model="potential_gains" readonly="">
-            </div>
-            </fieldset>
-            <fieldset>
-              <textarea class="pure-input" v-model="storage_string"></textarea>
-            </fieldset>
-            <fieldset>
-              <button type="button" class ="pure-button" v-on:click="import_storage">Import</button>
-              <button type="button" class ="pure-button" v-on:click="export_storage">Export</button>
-            </fieldset>
-            <button type="button" class="pure-button button-danger" v-on:click="clear_all">Clear all</button>
-          </form>
-        </div>
-        </div>
-      </div>
+      <div class="section-header"> Portfolio </div>
       <div>
         <table class="pure-table pure-table-striped">
         <thead >
@@ -124,6 +84,41 @@
         </tr>
         </table>
       </div>
+      <div class="section-header"> Add new stock </div>
+      <div class="padded">
+        <form class="pure-form pure-form-aligned">
+            <fieldset>
+            <div class="pure-control-group">
+              <label for="symbol"> Symbol :</label>
+              <input id="symbol" v-model="addsymbol">
+            </div>
+            <div class="pure-control-group">
+              <label for="amount"> Amount :</label>
+              <input id="amount" v-model="addamount">
+            </div>
+            <div class="pure-control-group">
+              <label for="price"> Buying price :</label>
+              <input id="price" v-model="addprice">
+            </div>
+            <div class="pure-controls">
+              <button type="button" class="pure-button pure-button-primary" v-on:click="add_stock">Add</button>
+            </div>
+            </fieldset>
+        </form>
+      </div>
+      <div class="section-header"> Import/export </div>
+      <div class="padded">
+          <form class="pure-form pure-form-aligned">
+            <fieldset>
+              <textarea class="pure-input" v-model="storage_string"></textarea>
+            </fieldset>
+            <fieldset>
+              <button type="button" class ="pure-button" v-on:click="import_storage">Import</button>
+              <button type="button" class ="pure-button" v-on:click="export_storage">Export</button>
+              <button type="button" class="pure-button button-danger" v-on:click="clear_all">Clear all</button>
+            </fieldset>
+          </form>
+        </div>
     </div>
   </div>
   <script defer src="ext/stocks.js"></script>
