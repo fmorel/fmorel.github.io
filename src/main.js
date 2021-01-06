@@ -58,8 +58,13 @@ Vue.component('portfolio-chart', {
     props: {
         stock: Object,
     },
+    computed : {
+        get_chart_id: function() {
+           return 'chart_' + this.stock.id;
+        }
+    },
     mounted: function () {
-        var ctx = document.getElementById('chart_' + this.stock.id);
+        var ctx = document.getElementById(this.get_chart_id);
         var chart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -68,7 +73,8 @@ Vue.component('portfolio-chart', {
                     label: this.stock.symbol,
                     data: this.stock.chart_data,
                     borderColor : 'rgba(128, 128, 255, 0.8)',
-                    backgroundColor: 'rgba(64, 64, 192, 0.5)'
+                    backgroundColor: 'rgba(64, 64, 192, 0.5)',
+                    pointRadius: 0,
                 }]
             },
             options : {
@@ -76,6 +82,9 @@ Vue.component('portfolio-chart', {
                     xAxes : [{
                         type: "time",
                     }]
+                },
+                legend : {
+                    display: false,
                 },
                 annotation: {
                     annotations: [{
@@ -85,10 +94,7 @@ Vue.component('portfolio-chart', {
                         scaleID: 'y-axis-0',
                         value: this.stock.buying_price,
                         borderColor: 'rgba(255, 128, 128, 0.8)',
-                        label: {
-                            enabled: true,
-                            content: 'Buying price'
-                        }
+                        borderWidth: 2,
                     }]
                 }
             }
@@ -97,7 +103,7 @@ Vue.component('portfolio-chart', {
     template : `
         <tr>
         <td colspan="6">
-        <canvas v-bind:id="'chart_' + stock.id"></canvas>
+        <canvas v-bind:id="get_chart_id"></canvas>
         </td>
         </tr>
     `
