@@ -8,18 +8,22 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
   <!-- Alphavantage -->
   <script src="https://cdn.jsdelivr.net/npm/alphavantage/dist/bundle.js"></script>
+  <!-- Chart -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.min.js"></script>
   <!-- Pure CSS -->
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css">
   <style>
       .content {
         margin: auto;
-        max-width: 768px;
-        padding: 2em;
+        max-width: 800px;
+        padding: 1em;
         float: none;
       }
       .content table {
         margin: auto;
         width: 100%;
+        max-width: 100%;
       }
       .content textarea {
         width: 100%;
@@ -46,11 +50,16 @@
         color: white;
         background: rgb(202, 60, 60);
       }
+      .button-inline {
+        display: inline;
+        margin-right: 10px;
+      }
       .section-header {
         border-bottom-style: solid;
         border-color: grey;
         padding: 1em;
         font-weight: bold;
+        margin-bottom: 10px;
       }
   </style>
   <title>Portfolio</title>
@@ -76,12 +85,19 @@
             <th>Action</th>
         </tr>
         </thead>
-        <tr is="portfolio-element"
-          v-for="stock in stocks"
-          v-bind:key="stock.id"
-          v-bind:stock="stock"
-          v-on:sell-stock="sell_stock(stock)">
-        </tr>
+        <template v-for="stock in stocks">
+          <tr is="portfolio-element"
+            v-bind:key="stock.id"
+            v-bind:stock="stock"
+            v-on:sell-stock="sell_stock(stock)"
+            v-on:toggle-chart="toggle_chart(stock)">
+          </tr>
+          <tr is="portfolio-chart"
+            v-bind:key="stock.id + '.1'"
+            v-bind:stock="stock"
+            v-if="stock.show_chart">
+          </tr>
+        </template>
         </table>
       </div>
       <div class="section-header"> Add new stock </div>
