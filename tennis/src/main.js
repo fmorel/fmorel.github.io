@@ -20,7 +20,7 @@ function game(p)
 {
     var score = [0, 0];
     while (true) {
-        r = Math.random()
+        r = Math.random();
         if (r <= p)
             score[0]++;
         else
@@ -39,7 +39,7 @@ Set.prototype.play = function ()
     while (true) {
         // Play a game and update set score
         cur_win = game(this.prob[this.cur_player]);
-        this.score[cur_player ^ cur_win]++;
+        this.score[this.cur_player ^ cur_win]++;
         // Next player to serve
         this.cur_player ^= 1;
         // Victory condition
@@ -73,7 +73,18 @@ Match.prototype.play = function ()
             break;
         }
     }
-    alert("Player " + this.winner + "wins the match in " + (this.cur_set-1) + "sets");
+    var results_rows = ["<th>Player A</td>", "<th>Player B</td>"];
+    this.sets.forEach(
+        function(set) {
+            results_rows[0] +="<td>" + set.score[0] + "</td>";
+            results_rows[1] +="<td>" + set.score[1] + "</td>";
+        }
+    );
+    if (this.winner == 0)
+        this.results_html = "<table class='padded'><tr class='winner-row'>" + results_rows[0] + "</tr><tr>" + results_rows[1] + "</tr></table>";
+    else
+        this.results_html = "<table class='padded'><tr>" + results_rows[0] + "</tr><tr class='winner-row'>" + results_rows[1] + "</tr></table>";
+        
 }
 
 
@@ -83,6 +94,7 @@ function match()
     p_other = document.getElementById("other_win").value;
     var match = new Match(p_serve, p_other);
     match.play();
+    document.getElementById("results").innerHTML = match.results_html;
 }
     
 
