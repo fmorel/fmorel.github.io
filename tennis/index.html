@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Pure CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css">
+  <style>
+      .content {
+        margin: auto;
+        max-width: 800px;
+        padding: 1em;
+        float: none;
+      }
+      .content table {
+        margin: auto;
+        width: 100%;
+        max-width: 100%;
+      }
+      .content textarea {
+        width: 100%;
+        max-width: 100%;
+      }
+      th {
+        text-align: center;
+      }
+      .splash {
+        background: #1f8dd6;
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+      }
+      .centered {
+        text-align: center;
+      }
+      .padded {
+        padding: 10px
+      }
+      .button-danger {
+        color: white;
+        background: rgb(202, 60, 60);
+      }
+      .button-inline {
+        display: inline;
+        margin-right: 10px;
+      }
+      .section-header {
+        border-bottom-style: solid;
+        border-color: grey;
+        padding: 1em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+  </style>
+  <title>Tennis simulator</title>
+</head>
+
+<body>
+  <div class="content">
+    <div class="splash">
+      <h1> Tennis scoring simulator </h1>
+    </div>
+    <br>
+    <div class="section-header"> Parameters </div>
+    <div class="padded">
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group">
+            <label for="serve_win"> Probability to win point when Player A serve :</label>
+            <input id="serve_win">
+          </div>
+          <div class="pure-control-group">
+            <label for="other_win"> Probability to win point when Player B serve :</label>
+            <input id="other_win">
+          </div>
+          <div class="pure-controls">
+            <button type="button" class="pure-button pure-button-primary" onclick="match()">Single match</button>
+            <button type="button" class="pure-button pure-button-primary" onclick="match_500()">1000 matches</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="section-header"> Results </div>
+    <div class ="padded">
+    </div>
+  </div>
+  <script defer src="src/main.js"></script>
+</body>
+</html>
+
+
