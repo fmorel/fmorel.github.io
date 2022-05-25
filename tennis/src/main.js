@@ -31,6 +31,7 @@ function Stats()
 function MultipleStats()
 {
     this.n_sets_sum = 0;
+    this.n_points_sum = 0;
     this.n_matches = 0;
     this.min_n_points = 10000;
     this.max_n_points = 0;
@@ -176,7 +177,9 @@ Match.prototype.play = function ()
 MultipleStats.prototype.update = function(match)
 {
     this.n_sets_sum += match.cur_set;
+    this.n_points_sum += match.stats.n_points_tot;
     this.n_matches++;
+
     if (match.stats.n_points_tot < this.min_n_points) {
         this.min_n_points = match.stats.n_points_tot;
         this.min_n_points_match = match;
@@ -197,7 +200,11 @@ MultipleStats.prototype.update = function(match)
 MultipleStats.prototype.display = function()
 {
     var mean_sets = this.n_sets_sum / this.n_matches;
+    var mean_points = this.n_points_sum / this.n_matches;
+
     var html = "Average number of sets: <b>" + mean_sets.toPrecision(3) + "</b>";
+
+    html += "<br><br>Average number of points: <b>" + mean_points.toPrecision(5) + "</b> points.";
 
     html += "<br><br>Shortest match: <b>" + this.min_n_points + "</b> points:<br>";
     html += this.min_n_points_match.results_html;
@@ -278,8 +285,10 @@ function match_multiple()
             rem_matches -= j;
             if (rem_matches == 0) {
                 clearInterval(int_id);
-                document.getElementById("results").innerHTML += "<br> Player A wins : " + score[0] + " - " + 100*(score[0]/n_matches) + "%";
-                document.getElementById("results").innerHTML += "<br> Player B wins : " + score[1] + " - " + 100*(score[1]/n_matches) + "%";
+                var ratio0 = 100*(score[0]/n_matches);
+                var ratio1 = 100*(score[1]/n_matches);
+                document.getElementById("results").innerHTML += "<br> Player A wins : " + score[0] + " - " + ratio0.toPrecision(4) + "%";
+                document.getElementById("results").innerHTML += "<br> Player B wins : " + score[1] + " - " + ratio1.toPrecision(4) + "%";
                 document.getElementById("stats").innerHTML = mstats.display();
             }
         },
