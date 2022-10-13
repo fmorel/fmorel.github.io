@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Pure CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css">
+  <script src="https://apis.google.com/js/api.js"></script>
+  <style>
+      .content {
+        margin: auto;
+        max-width: 700px;
+        padding: 1em;
+        float: none;
+      }
+      .content table {
+        margin: auto;
+        width: 100%;
+        max-width: 100%;
+      }
+      .content textarea {
+        width: 100%;
+        max-width: 100%;
+      }
+      th {
+        text-align: center;
+      }
+      .winner-row {
+        background-color: green;
+      }
+      .splash {
+        background: #1f8dd6;
+        width: 85%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+      }
+      .centered {
+        text-align: center;
+      }
+      .padded {
+        padding: 5px
+      }
+      .section-header {
+        border-bottom-style: solid;
+        border-color: grey;
+        padding: 1em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+  </style>
+  <title>FindMyNuke</title>
+</head>
+
+<body>
+  <div class="content">
+    <div class="splash">
+      <h1> Guess nuclear powerplant </h1>
+    </div>
+    <br>
+    <div class="section-header"> Parameters </div>
+    <div class="padded">
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group">
+            <label for="restrict_area">Restriction area: </label>
+            <select id="restrict_area">
+                <option> WORLD </option>
+                <option> CANADA </option>
+                <option> CHINA </option>
+                <option> FRANCE </option>
+                <option> INDIA </option>
+                <option> JAPAN </option>
+                <option> KOREA </option>
+                <option> RUSSIA </option>
+                <option> UK </option>
+                <option> UKRAINE </option>
+                <option> USA </option>
+            </select>
+          </div>
+          <div class="pure-control-group">
+            <label id="n_choices_label" for="n_choices">Choices: 3 </label>
+            <input id="n_choices" type="range" min="2" max="5" onchange="choices_update(this.value)" value="3">
+          </div>
+          <div class="pure-controls">
+            <button type="button" class="pure-button pure-button-primary" onclick="start()">Start game!</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="section-header" id="picture_div" style="display:none"> Picture </div>
+    <div class="padded" id="picture_in" style="display:none">
+      <img id="picture_content" src="">
+    </div>
+    <div class="section-header" id="guess" style="display:none"> Your guess </div>
+    <div class="padded" id="guess_in" style="display:none">
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group" id="guess_content">
+            <label for="checkbox-radio-option" class="pure-radio">
+              <input type="radio" id="checkbox-radio-option" value="option1" checked=""/> Option 1
+            </label>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  <script src="src/main.js"></script>
+</body>
+</html>
+
+
