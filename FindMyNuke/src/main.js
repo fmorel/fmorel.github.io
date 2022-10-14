@@ -3,6 +3,7 @@
   var restrict_area= "WORLD";
   var reactor_list = [];
   var n_reactors = 0;
+  var answer;
 
   gapi.load("client");
   
@@ -21,6 +22,10 @@
     client_loaded = true;
     n_choices = document.getElementById('n_choices').value;
     restrict_area = document.getElementById('restrict_area').value;
+
+    document.getElementById('settings_div').style.display="none";
+    document.getElementById('settings_in').style.display="none";
+
     document.getElementById('picture_div').style.display="inherit";
     document.getElementById('picture_in').style.display="inherit";
     fetch('./resources/ReactorList.json')
@@ -47,21 +52,39 @@
     /* Remove duplicates with set */
     reactor_list = Array.from(new Set(reactor_list));
     n_reactors = reactor_list.length;
-    for (let i = 0; i < 1; i++) {
-        game_step();
-    }
+    game_step();
   }
 
   function rand_int(n) {
     return Math.floor(Math.random()*n);
   }
 
+  function m_distinct_rand(m, n) {
+    var ret = [];
+    var i = 0;
+    if (m > n)
+        return [0];
+    while (i < m) {
+        p = rand_int(n);
+        if (!(ret.includes(p))) {
+            ret[i] = p;
+            i++;
+        }
+    }
+    return ret;
+  }
+
   function next_step() {
+    document.getElementById('result_div').style.display = 'none';
+    document.getElementById('result_in').style.display = 'none';
+    document.getElementById('result_next').style.display = 'none';
+
+    game_step();
   }
 
   function game_step() {
-    var idx = rand_int(n_reactors);
-    var reactor = reactor_list[idx];
+    var clues = m_distinct_rand(n_choices, n_reactors);
+    var reactor = reactor_list[clues[0]];
 
     gapi.client.search.cse.list({
      "cx":"d55ce6910417e47c5",
@@ -89,13 +112,51 @@
             dom_img.src = img_url;
             dom_img.width = 700;
             dom_img.height = 700 * ratio;
-            next_step();
+            display_clues(clues);
         }
     },
         function(err) { 
         console.error("Execute error", err);
     });
   }
+
+  function display_clues(clues) {
+    document.getElementById('guess').style.display = 'inherit';
+    document.getElementById('guess_in').style.display = 'inherit';
+    radio_content = '';
+    const numbers = ['one', 'two', 'three', 'four', 'five'];
+    answer = clues[0];
+    clues = clues.sort(function(a, b) {
+                        return reactor_list[a].name < reactor_list[b].name;
+                       });
+    for (i = 0; i < clues.length; i++) {
+        reactor = reactor_list[clues[i]];
+        radio_content += '<label for="checkbox-radio-option" class="pure-radio">\n';
+        radio_content += '<input type="radio" id="checkbox-radio-option-' + numbers[i] + '" name="guess_choice" value="' + clues[i] +'" checked="' + ((i == 0) ? 'true' : 'false') + '"/> '
+        radio_content += reactor.name + ', ' + reactor.country + '\n';
+        radio_content += '</label>\n';
+    }
+    document.getElementById('guess_content').innerHTML = radio_content;
+  }
+
+  function guess() {
+    var select_answer = document.querySelector('input[name="guess_choice"]:checked').value;
+    
+    document.getElementById('guess').style.display = 'none';
+    document.getElementById('guess_in').style.display = 'none';
+
+    document.getElementById('result_div').style.display = 'inherit';
+    document.getElementById('result_in').style.display = 'inherit';
+    document.getElementById('result_next').style.display = 'inherit';
+
+    reactor = reactor_list[answer];
+    if (select_answer == answer)
+        document.getElementById('result_in').innerHTML = '<h1> Right !</h1><br>';
+    else
+        document.getElementById('result_in').innerHTML = '<h1> Wrong !</h1><br>';
+    document.getElementById('result_in').innerHTML += 'Right answer is: ' + reactor.name + ', ' + reactor.country + '<br>';
+  }
+
 
   function choices_update(val) {
     document.getElementById('n_choices_label').innerHTML = "Choices: " + val + " ";
