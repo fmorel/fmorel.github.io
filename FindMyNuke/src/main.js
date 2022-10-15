@@ -110,8 +110,8 @@
             /* Set image  and force it to 600px wide*/
             var dom_img = document.getElementById('picture_content');
             dom_img.src = img_url;
-            dom_img.max-width = "100%";
-            dom_img.height = "auto";
+            dom_img.width = "700px";
+            dom_img.height = 700*ratio +"px";
             display_clues(clues);
         }
     },
