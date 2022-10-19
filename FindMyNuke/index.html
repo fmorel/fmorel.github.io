@@ -4,6 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Pure CSS -->
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.3/build/pure-min.css">
+  <link rel="icon" type="image/png" href="/resources/favicon.png">
   <script src="https://apis.google.com/js/api.js"></script>
   <style>
       .content {
@@ -45,7 +46,7 @@
     </div>
     <br>
     <div class="section-header" id="settings_div"> Settings </div>
-    <div class="padded" id="settings_in">
+    <div class="padded centered" id="settings_in">
       <form class="pure-form pure-form-aligned">
         <fieldset>
           <div class="pure-control-group">
@@ -68,18 +69,21 @@
             <label id="n_choices_label" for="n_choices">Choices: 3 </label>
             <input id="n_choices" type="range" min="2" max="5" onchange="choices_update(this.value)" value="3">
           </div>
-          <div class="pure-controls">
+          <div class="pure-control-group">
             <button type="button" class="pure-button pure-button-primary" onclick="start()">Start game!</button>
           </div>
         </fieldset>
       </form>
     </div>
     <div class="section-header" id="picture_div" style="display:none"> Picture </div>
-    <div class="padded" id="picture_in" style="display:none">
+    <div class="padded centered" id="picture_in" style="display:none">
       <img id="picture_content" src="">
+      <div id="picture_wait" style="display:none">
+        <br> Please wait ... <br>
+      </div>
     </div>
     <div class="section-header" id="guess" style="display:none"> Your guess </div>
-    <div class="padded" id="guess_in" style="display:none">
+    <div class="padded centered" id="guess_in" style="display:none">
       <form class="pure-form pure-form-stacked">
         <fieldset>
           <div class="pure-control-group" id="guess_content">
@@ -87,17 +91,18 @@
               <input type="radio" id="checkbox-radio-option" value="option1" checked=""/> Option 1
             </label>
           </div>
-          <div class="pure-controls">
+          <div class="pure-control-group">
             <button type="button" class="pure-button pure-button-primary" onclick="guess()">Guess</button>
           </div>
         </fieldset>
       </form>
     </div>
     <div class = "section-header" id="result_div" style="display:none"> Result </div>
-      <div class="padded" id="result_in" style="display:none">
+      <div class="padded centered" id="result_in" style="display:none">
       </div>
-      <div class="padded" id="result_next" style="display:none">
+      <div class="padded centered" id="result_next" style="display:none">
       <button type="button" class="pure-button pure-button-primary" onclick="next_step()">Next</button>
+      <br><br>
       </div>
     </div>
   </div>

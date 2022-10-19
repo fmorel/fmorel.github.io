@@ -1,9 +1,12 @@
   var client_loaded = false;
-  var n_choices = 2;
+  var n_choices = 3;
   var restrict_area= "WORLD";
   var reactor_list = [];
   var n_reactors = 0;
   var answer;
+  var fuzz;
+  var cur_page;
+  var clues;
 
   gapi.load("client");
   
@@ -78,49 +81,100 @@
     document.getElementById('result_div').style.display = 'none';
     document.getElementById('result_in').style.display = 'none';
     document.getElementById('result_next').style.display = 'none';
+    document.getElementById('picture_wait').style.display= 'none';
+    document.getElementById('picture_in').style.display= 'inherit';
 
     game_step();
   }
 
-  function game_step() {
-    var clues = m_distinct_rand(n_choices, n_reactors);
-    var reactor = reactor_list[clues[0]];
+  function retry_step() {
+    document.getElementById('picture_in').style.display= 'none';
+    document.getElementById('picture_wait').style.display= 'inherit';
+    setTimeout(next_step, 1000);
+  }
 
-    gapi.client.search.cse.list({
-     "cx":"d55ce6910417e47c5",
-     "q": reactor.country + ' ' + reactor.name + ' ' + "power plant",
-     "imgSize": "large",
-     "imgType": "photo"
-    })
-    .then(function(response) {
-        var metatag;
-        /* Look-up the first 50 results to take the first suitable image */
-        for (let i = 0; i < 50; i++) {
-            metatag = response.result.items[i].pagemap.metatags[0];
-            if ("og:image" in metatag && "og:image:width" in metatag && metatag["og:image:width"] >= 600)
-                break;
-        }
-        /* Could not find a suitable image ... go to next step */
-        if (!("og:image" in metatag)) {
-            console.log("Could not find a suitable image for " + reactor.name + " in " + reactor.country);
-            next_step();
-        } else {
-            var ratio = metatag["og:image:height"] / metatag["og:image:width"];
-            var img_url = metatag["og:image"];
-            /* Set image  and force it to 600px wide*/
-            var dom_img = document.getElementById('picture_content');
-            dom_img.src = img_url;
-            dom_img.width = 700;
-            dom_img.height = 700*ratio;
-            display_clues(clues);
-        }
-    },
+  function handle_result_page(response) {
+      var metatag;
+      var found = false;
+
+      if (response.status != 200 ||
+          !response.result || !response.result.items) {
+          console.log("Bad response, code: " + response.status);
+          retry_step();
+          return;
+      }
+      /* Look for suitable images and take the fuzz-th image */
+      for (let i = 0; i < response.result.items.length; i++) {
+          let item = response.result.items[i];
+          if (!item.pagemap || !item.pagemap.metatags || !item.pagemap.metatags.length)
+              continue;
+          metatag = item.pagemap.metatags[0];
+          if (metatag && "og:image" in metatag && "og:image:width" in metatag && metatag["og:image:width"] >= 600) {
+              if (fuzz == 0) {
+                  found = true;
+                  break;
+              } else {
+                  fuzz--;
+              }
+          }
+      }
+      /* Could not find a suitable image */
+      if (!found) {
+          console.log("Could not find a suitable image");
+          cur_page++;
+          if (cur_page == 4) {
+            /* Next step */
+            console.log("Not suitable result after 5 pages, next step");
+            retry_step();
+          } else {
+            let next_page = response.result.queries.nextPage[0];
+            /* Next result page */
+            perform_query(
+            {
+              "cx": next_page.cx,
+              "q": next_page.searchTerms,
+              "imgSize": next_page.imgSize,
+              "imgType": next_page.imgType,
+              "start": next_page.startIndex
+            });
+          }
+      } else {
+          var img_url = metatag["og:image"];
+          var dom_img = document.getElementById('picture_content');
+          dom_img.src = img_url;
+          dom_img.style.width = "100%";
+          dom_img.style.height = "auto";
+          /* Carry on the quizz */
+          display_clues(clues);
+      }
+  }
+
+  function perform_query(query) {
+    gapi.client.search.cse.list(query).then(
+        handle_result_page,
         function(err) { 
-        console.error("Execute error", err);
+            console.error("Execute error", err);
+            retry_step();
+        }
+    );
+  }
+
+  function game_step() {
+    clues = m_distinct_rand(n_choices, n_reactors);
+    fuzz = rand_int(2);
+    cur_page = 0;
+    var reactor = reactor_list[clues[0]];
+    
+    perform_query(
+    {
+      "cx":"d55ce6910417e47c5",
+      "q": reactor.country + ' ' + reactor.name + ' ' + "power plant",
+      "imgSize": "large",
+      "imgType": "photo"
     });
   }
 
-  function display_clues(clues) {
+  function display_clues() {
     document.getElementById('guess').style.display = 'inherit';
     document.getElementById('guess_in').style.display = 'inherit';
     radio_content = '';
@@ -154,7 +208,7 @@
         document.getElementById('result_in').innerHTML = '<h1> Right !</h1><br>';
     else
         document.getElementById('result_in').innerHTML = '<h1> Wrong !</h1><br>';
-    document.getElementById('result_in').innerHTML += 'Right answer is: ' + reactor.name + ', ' + reactor.country + '<br>';
+    document.getElementById('result_in').innerHTML += 'Right answer is: ' + reactor.name + ', ' + reactor.country + ' started in ' + reactor.date + 'with a (thermal) power per reactor of ' + reactor.power + ' MW<br>';
   }
 
 
