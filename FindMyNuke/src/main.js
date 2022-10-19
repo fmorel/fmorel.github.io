@@ -7,6 +7,9 @@
   var fuzz;
   var cur_page;
   var clues;
+  var n_step;
+  var n_success;
+  var score;
 
   gapi.load("client");
   
@@ -21,6 +24,13 @@
     }
   }
 
+  function update_score() {
+    score = n_success * n_choices * n_reactors;
+    document.getElementById('score_in').innerHTML =
+        'Successful guesses: ' + n_success +' / ' + n_step + '<br>' +
+        'Score: ' + score + '<br>';
+  }
+
   function start_game() {
     client_loaded = true;
     n_choices = document.getElementById('n_choices').value;
@@ -31,6 +41,9 @@
 
     document.getElementById('picture_div').style.display="inherit";
     document.getElementById('picture_in').style.display="inherit";
+
+    n_step = 0;
+    n_success = 0;
     fetch('./resources/ReactorList.json')
     .then(function(response) {
            return response.json();
@@ -55,6 +68,11 @@
     /* Remove duplicates with set */
     reactor_list = Array.from(new Set(reactor_list));
     n_reactors = reactor_list.length;
+    
+    update_score();
+    document.getElementById('score_div').style.display="inherit";
+    document.getElementById('score_in').style.display="inherit";
+    
     game_step();
   }
 
@@ -199,16 +217,26 @@
     document.getElementById('guess').style.display = 'none';
     document.getElementById('guess_in').style.display = 'none';
 
-    document.getElementById('result_div').style.display = 'inherit';
-    document.getElementById('result_in').style.display = 'inherit';
-    document.getElementById('result_next').style.display = 'inherit';
 
     reactor = reactor_list[answer];
-    if (select_answer == answer)
+    n_step++;
+    if (select_answer == answer) {
         document.getElementById('result_in').innerHTML = '<h1> Right !</h1><br>';
-    else
+        n_success++;
+    } else {
         document.getElementById('result_in').innerHTML = '<h1> Wrong !</h1><br>';
+    }
     document.getElementById('result_in').innerHTML += 'Right answer is: ' + reactor.name + ', ' + reactor.country + ' started in ' + reactor.date + 'with a (thermal) power per reactor of ' + reactor.power + ' MW<br>';
+    update_score();
+
+    if (n_step == 10)
+        document.getElementById('result_in').innerHTML += 'End of the game, you scored <b>' + score + 'points !</b><br>Please reload the page if you want to play again<br>';
+
+    document.getElementById('result_div').style.display = 'inherit';
+    document.getElementById('result_in').style.display = 'inherit';
+    
+    if (n_step < 10)
+        document.getElementById('result_next').style.display = 'inherit';
   }
 
 
